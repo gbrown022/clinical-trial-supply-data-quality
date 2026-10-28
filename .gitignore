@@ -1,0 +1,13 @@
+# Excel temporary and lock files
+~$*.xlsx
+~$*.xlsm
+*.tmp
+
+# Operating system files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Python cache (if we add Python later)
+__pycache__/
+*.py[cod]
