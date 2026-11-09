@@ -30,3 +30,28 @@ Project scope defined, local repository created, synthetic source workbook added
 
 ### Next Step
 Profile the source data and document data-quality findings before making changes.
+
+## 2026-11-09: Initial Data Profiling
+
+### Work Completed
+- Quantified missing Delivery Dates and classified records by Shipment Status.
+- Identified six text-formatted Kits Requested values.
+- Profiled Shipment Status values using a PivotTable.
+- Investigated the singleton Pending status (SHP-0064).
+- Investigated the trailing-space Delivered status (SHP-0093).
+- Confirmed SHP-0013 is the only repeated Shipment ID.
+- Completed a formula-based shipment/delivery chronology check.
+
+### Key Results
+- 59 records have missing Delivery Dates.
+- 7 of those records are marked Delivered or Delivery Confirmed.
+- 6 of 101 Kits Requested values (5.9%) are stored as text.
+- 7 distinct Shipment Status labels were identified.
+- 1 repeated Shipment ID was identified: SHP-0013.
+
+### Status
+
+Initial profiling checks completed for selected fields. Findings and recommended actions documented in the data quality assessment. Additional profiling may be performed as needed during the cleaning and validation phases.
+
+### Next Step
+Define and document transformation rules before creating the cleaned dataset.

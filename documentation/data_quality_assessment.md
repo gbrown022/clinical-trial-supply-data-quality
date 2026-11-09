@@ -48,9 +48,18 @@ The findings are preliminary. Some checks were performed systematically across t
 
 **Cleaning decision:** Do not infer or populate Site IDs without verification.
 
-### DQ-02: Missing Delivery Dates for Completed Deliveries
+### DQ-02: Missing Delivery Dates
 
-**Observation:** Seven records marked Delivered or Delivery Confirmed have missing Delivery Dates:
+**Observation:** 59 records have missing Delivery Dates. Their Shipment Status breakdown is:
+
+| Shipment Status | Missing Delivery Dates |
+|---|---:|
+| Delivered / Delivery Confirmed | 7 |
+| In Transit | 27 |
+| Pending / Pending Dispatch | 25 |
+| **Total** | **59** |
+
+The seven completed-delivery records are:
 
 - SHP-0010
 - SHP-0029
@@ -78,32 +87,50 @@ The findings are preliminary. Some checks were performed systematically across t
 
 ### DQ-04: Numeric Values Stored as Text
 
-**Observation:** Some values in Kits Requested appear numeric but are stored as text.
+### DQ-04: Numeric Values Stored as Text
+
+**Observation:** Six of 101 records (5.9%) have numeric-looking values in `Kits Requested` stored as text.
+
+| Shipment ID | Kits Requested |
+|---|---:|
+| SHP-0020 | 24 |
+| SHP-0070 | 24 |
+| SHP-0087 | 24 |
+| SHP-0008 | 36 |
+| SHP-0053 | 12 |
+| SHP-0038 | 60 |
 
 **Potential impact:** Text-formatted quantities can interfere with calculations, sorting, aggregation, and numeric validation.
 
-**Recommended action:** Determine the extent of the inconsistency and inspect the affected values.
+**Recommended action:** Convert valid numeric text values to numbers in the cleaned dataset and verify that all affected values are correctly interpreted.
 
-**Cleaning decision:** Convert valid quantities to numeric values in the cleaned dataset, preserving the original source data and documenting the transformation.
+**Cleaning decision:** Preserve the original source data. Document the conversion and validate the resulting numeric values in the cleaned dataset.
 
 ### DQ-05 and DQ-06: Shipment Status Inconsistencies
 
-**Observation:** Shipment Status contains variations in terminology, capitalization, spacing, and punctuation. Examples include:
+**Observation:** Shipment Status contains seven distinct stored labels across 101 records. Variations include differences in terminology, capitalization, punctuation, and spacing.
 
-- Delivered
-- Delivery Confirmed
-- DELIVERY CONFIRMED
-- In Transit
-- In transit
-- In-Transit
-- Pending
-- Pending Dispatch
+| Shipment Status | Record Count |
+|---|---:|
+| Delivered | 21 |
+| Delivered (trailing space) | 1 |
+| Delivery Confirmed | 25 |
+| In Transit | 25 |
+| In-Transit | 2 |
+| Pending | 1 |
+| Pending Dispatch | 26 |
+| **Total** | **101** |
 
-**Potential impact:** Equivalent statuses may be counted separately in filters, summaries, and reports. Conversely, combining genuinely different statuses could remove useful operational distinctions.
+**Additional observations:**
+
+- SHP-0064 is the only record with status `Pending`. It has 24 Kits Requested and 24 Kits Shipped, a Delivery Date three days after its Ship Date, and Notes stating "Routine resupply". This may indicate a status inconsistency, but the intended business definition requires confirmation.
+- SHP-0093 has a trailing space in its `Delivered` status and also has a missing Delivery Date.
+
+**Potential impact:** Inconsistent status values may cause equivalent shipment states to be counted separately in filters, summaries, and reports. Incorrectly combining distinct operational states could also remove meaningful information.
 
 **Recommended action:** Confirm the intended definitions of each status. Standardize capitalization, spacing, punctuation, and terminology where equivalence is established.
 
-**Cleaning decision:** Do not automatically combine Pending and Pending Dispatch. Their operational meanings must be confirmed first.
+**Cleaning decision:** Treat obvious formatting variations separately from potential differences in business meaning. Do not automatically combine `Pending` and `Pending Dispatch`, or `Delivered` and `Delivery Confirmed`, without confirmation of their intended meanings.
 
 ### DQ-07: Missing Kits Shipped Values
 
@@ -137,23 +164,29 @@ The findings are preliminary. Some checks were performed systematically across t
 
 ### DQ-10: Potential Duplicate Shipment Record
 
-**Observation:** Shipment ID SHP-0013 appears in rows 14 and 15. A field-by-field comparison found that all compared fields match except Notes. The second record includes the note "Duplicate? added from weekly export".
+**Observation:** Shipment ID SHP-0013 appears twice, in rows 14 and 15. A field-by-field comparison found that all fields match except Notes. The second record includes the note "Duplicate? added from weekly export".
 
-**Potential impact:** If both rows represent the same shipment, counting both could inflate shipment volumes or duplicate operational reporting.
+A PivotTable analysis of Shipment ID confirmed that SHP-0013 is the only repeated Shipment ID in the dataset, with two total occurrences.
 
-**Recommended action:** Compare the records with the source export and determine whether the repeated ID represents a duplicate, a legitimate repeated identifier, or another issue.
+**Potential impact:** If both records represent the same shipment, counting both could inflate shipment volumes and distort operational reporting or reconciliation.
 
-**Cleaning decision:** Preserve both records in the source data. Exclude a record from a cleaned output only after duplication is confirmed and the decision is documented.
+**Recommended action:** Compare the records against the source export and determine whether the repeated entry is a duplicate or represents a legitimate business event.
+
+**Cleaning decision:** Preserve both records in the source data. Exclude one from the cleaned output only after duplication is confirmed and the decision is documented.
 
 ### DQ-11: Shipment and Delivery Date Chronology
 
-**Observation:** A formula compared Ship Date and Delivery Date across the dataset. It flagged missing dates but did not identify any delivery dates earlier than their corresponding shipment dates.
+**Validation performed:** A formula-based check compared Ship Date (column J) and Delivery Date (column K) across all 101 records.
 
-**Potential impact:** Chronologically invalid dates can undermine shipment history and delivery performance reporting.
+**Observation:** No records were flagged with a Delivery Date earlier than the corresponding Ship Date. The check identified missing dates, which are documented separately under DQ-02.
 
-**Recommended action:** Retain the validation check as part of the documented quality-control process. Investigate missing dates separately.
+**Potential impact:** Chronologically invalid dates could undermine shipment history, delivery performance reporting, and operational analysis.
 
-**Limitation:** This check establishes only that no delivery-before-shipment cases were flagged. It does not establish that every date is accurate or operationally plausible.
+**Recommended action:** Retain the chronology check as part of the data-validation process. Investigate missing dates separately and verify date accuracy against trusted source records.
+
+**Validation result:** No shipment/delivery chronology violations were detected by this check.
+
+**Limitation:** This check establishes chronological consistency only. It does not establish that dates are accurate or operationally plausible.
 
 ## 5. Prioritization
 
