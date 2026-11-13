@@ -8,7 +8,7 @@ The assessment distinguishes observed conditions from confirmed errors. Records 
 
 ## 2. Scope and Method
 
-The initial review covered the shipment dataset using visual inspection, Excel filtering and sorting, duplicate-value highlighting, and formula-based validation.
+The initial review covered the shipment dataset using visual inspection, Excel filtering and sorting, duplicate-value highlighting, formula-based validation, and exploratory Power Query profiling of text fields and column completeness.
 
 The following areas were examined:
 
@@ -17,6 +17,7 @@ The following areas were examined:
 - Numeric values and potentially anomalous quantities
 - Potential duplicate shipment records
 - Shipment and delivery date chronology
+- Additional profiling of text fields and missing key identifiers
 
 The findings are preliminary. Some checks were performed systematically across the dataset, while others were based on initial visual inspection. All findings should be validated before being treated as final.
 
@@ -27,7 +28,7 @@ The findings are preliminary. Some checks were performed systematically across t
 | DQ-01 | Site ID | Three records have missing Site IDs. | Completeness | Observed |
 | DQ-02 | Delivery Date / Shipment Status | Seven records marked Delivered or Delivery Confirmed have missing Delivery Dates. | Completeness / cross-field consistency | Observed |
 | DQ-03 | Notes | Some records have blank Notes fields. | Completeness | Observed; significance undetermined |
-| DQ-04 | Kits Requested | Some numeric-looking values are stored as text. | Data type consistency | Confirmed inconsistency; extent not yet quantified |
+| DQ-04 | Kits Requested | Six numeric-looking values were stored as text. | Data type consistency | Confirmed; corrected in cleaned dataset and validated |
 | DQ-05 | Shipment Status | Variations include Delivered, Delivery Confirmed, and DELIVERY CONFIRMED. | Standardization / terminology | Observed; semantic equivalence requires confirmation |
 | DQ-06 | Shipment Status | Variations include In Transit, In transit, and In-Transit. | Standardization | Observed |
 | DQ-07 | Kits Shipped | SHP-0033 and SHP-0067 have missing quantities. | Completeness | Observed |
@@ -35,6 +36,7 @@ The findings are preliminary. Some checks were performed systematically across t
 | DQ-09 | Kits Shipped | SHP-0041 has a quantity of 999. | Potential outlier | Requires investigation |
 | DQ-10 | Shipment ID | SHP-0013 appears in rows 14 and 15. All compared fields match except Notes; the second record notes "Duplicate? added from weekly export". | Potential duplicate | Strong duplicate candidate; confirmation required |
 | DQ-11 | Shipment / Delivery Date | Formula-based comparison flagged missing dates but did not flag delivery dates earlier than shipment dates. | Chronological consistency | No violations detected by this check |
+| DQ-12 | Shipment ID | Two records for study STDY-C04 have missing Shipment IDs: Germany (DE), Site 401; and Spain (ES), Site 501. | Completeness / key identifier | Newly identified; source verification required |
 
 ## 4. Detailed Findings and Recommended Actions
 
@@ -87,8 +89,6 @@ The seven completed-delivery records are:
 
 ### DQ-04: Numeric Values Stored as Text
 
-### DQ-04: Numeric Values Stored as Text
-
 **Observation:** Six of 101 records (5.9%) have numeric-looking values in `Kits Requested` stored as text.
 
 | Shipment ID | Kits Requested |
@@ -106,9 +106,11 @@ The seven completed-delivery records are:
 
 **Cleaning decision:** Preserve the original source data. Document the conversion and validate the resulting numeric values in the cleaned dataset.
 
+**Cleaning status:** The six identified values were converted in the separate cleaned workbook. A formula-based check returned zero text values remaining in `Kits Requested`; the original quantities were confirmed as preserved. The raw source workbook remains unchanged.
+
 ### DQ-05 and DQ-06: Shipment Status Inconsistencies
 
-**Observation:** Shipment Status contains seven distinct stored labels across 101 records. Variations include differences in terminology, capitalization, punctuation, and spacing.
+**Observation:** The initial PivotTable analysis identified seven distinct stored labels across 101 records. Variations include differences in terminology, capitalization, punctuation, and spacing. A later exploratory Power Query profile displayed eight distinct values for `Shipment Status`. The difference between the two profiling results has not yet been reconciled; capitalization or other text variations may account for it.
 
 | Shipment Status | Record Count |
 |---|---:|
@@ -124,7 +126,7 @@ The seven completed-delivery records are:
 **Additional observations:**
 
 - SHP-0064 is the only record with status `Pending`. It has 24 Kits Requested and 24 Kits Shipped, a Delivery Date three days after its Ship Date, and Notes stating "Routine resupply". This may indicate a status inconsistency, but the intended business definition requires confirmation.
-- SHP-0093 has a trailing space in its `Delivered` status and also has a missing Delivery Date.
+- SHP-0093 had a trailing space in its `Delivered` status and also has a missing Delivery Date. The trailing space was removed manually in the cleaned workbook; the raw source remains unchanged. The missing Delivery Date remains unresolved.
 
 **Potential impact:** Inconsistent status values may cause equivalent shipment states to be counted separately in filters, summaries, and reports. Incorrectly combining distinct operational states could also remove meaningful information.
 
@@ -188,11 +190,29 @@ A PivotTable analysis of Shipment ID confirmed that SHP-0013 is the only repeate
 
 **Limitation:** This check establishes chronological consistency only. It does not establish that dates are accurate or operationally plausible.
 
+
+### DQ-12: Missing Shipment IDs
+
+**Observation:** Exploratory profiling of the cleaned-data copy identified two records with missing `Shipment ID` values. Both records belong to study `STDY-C04` and are associated with different sites:
+
+| Study ID | Country | Site ID | Shipment ID |
+|---|---|---:|---|
+| STDY-C04 | Germany (DE) | 401 | Missing |
+| STDY-C04 | Spain (ES) | 501 | Missing |
+
+The records are associated with different sites. Their Site Names are not reproduced here because the exact names have not yet been captured in the assessment.
+
+**Potential impact:** Missing Shipment IDs may prevent reliable shipment identification, source reconciliation, and record traceability.
+
+**Recommended action:** Recover the correct Shipment IDs from a trusted source.
+
+**Cleaning decision:** Do not generate or infer Shipment IDs. Preserve both records and flag the missing identifiers until verified values are available.
+
 ## 5. Prioritization
 
 The following order is a preliminary recommendation based on potential reporting and operational impact. It is not a formal risk assessment.
 
-1. **Resolve missing key information:** Investigate missing Site IDs, Kits Shipped quantities, and Delivery Dates for completed deliveries.
+1. **Resolve missing key information:** Investigate missing Site IDs, Shipment IDs, Kits Shipped quantities, and Delivery Dates for completed deliveries.
 2. **Investigate potentially misleading records:** Review the negative requested quantity, unusually large shipped quantity, and potential duplicate shipment.
 3. **Address calculation and reporting consistency:** Assess text-formatted numeric quantities and standardize shipment statuses where their meanings are confirmed.
 4. **Clarify field requirements:** Determine whether blank Notes fields are acceptable.
@@ -200,18 +220,20 @@ The following order is a preliminary recommendation based on potential reporting
 ## 6. Limitations
 
 - The dataset is synthetic and intended for practice and demonstration.
-- Findings are based on an initial review and are not a complete audit of all fields or business rules.
+- Findings are based on an initial review and subsequent exploratory profiling; they are not a complete audit of all fields or business rules.
+- An exploratory formula scan returned 12 cells for which `LEN(value)` differed from `LEN(TRIM(value))`. This comparison can flag leading/trailing spaces and repeated internal spaces; the affected cells have not yet been isolated, so the count is not treated as 12 confirmed leading/trailing-whitespace defects.
+- Power Query was used to inspect text fields and column quality. The exploratory query was discarded without loading its transformations to the worksheet; no bulk Power Query cleanup was applied.
 - Several observations require source-data verification or confirmation of business definitions.
 - No records have been declared erroneous solely because they appear unusual.
 - The assessment does not establish that the dataset reflects the full complexity of a production clinical supply system.
 
 ## 7. Next Steps
 
-1. Complete the initial assessment of identified data-quality issues.
-2. Establish and document transformation rules before cleaning.
-3. Create a cleaned dataset separately from the original source.
+1. Complete and reconcile the assessment, including the newly identified missing Shipment IDs and unresolved text-profiling results.
+2. Maintain documented cleaning rules for each proposed transformation.
+3. Continue cleaning in the separate cleaned workbook while preserving the raw source.
 4. Apply only justified corrections and standardizations.
-5. Validate the cleaned dataset against documented checks.
+5. Validate the cleaned dataset against documented checks and reconcile it to the raw source.
 6. Summarize the changes, unresolved exceptions, and validation results.
 
 ## 8. Working Principles
