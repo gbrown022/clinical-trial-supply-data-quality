@@ -180,9 +180,9 @@ A PivotTable analysis of Shipment ID confirmed that SHP-0013 is the only repeate
 
 **Validation performed:** A formula-based check compared Ship Date (column J) and Delivery Date (column K) across all 101 records.
 
-**Observation:** No records were flagged with a Delivery Date earlier than the corresponding Ship Date. The check identified missing dates, which are documented separately under DQ-02.
+**Observation:** One record, SHP-0086, has a Delivery Date earlier than its Ship Date. The Ship Date is 2026-08-28 and the Delivery Date is 2026-06-15. Missing dates were also identified and are documented separately under DQ-02.
 
-**Potential impact:** Chronologically invalid dates could undermine shipment history, delivery performance reporting, and operational analysis.
+**Validation result:** One chronology violation detected. Both dates remain unchanged pending verification against a trusted source.
 
 **Recommended action:** Retain the chronology check as part of the data-validation process. Investigate missing dates separately and verify date accuracy against trusted source records.
 

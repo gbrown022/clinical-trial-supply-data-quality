@@ -136,6 +136,18 @@ Pay particular attention to:
 
 **Treatment:** Preserve potentially meaningful status distinctions until their definitions are confirmed. Document any approved standardization.
 
+### CR-10: Investigate Missing Shipment IDs
+
+**Affected field:** `Shipment ID`
+
+**Observation:** Two records have missing Shipment IDs.
+
+**Rule:** Do not generate or infer Shipment IDs.
+
+**Investigation:** Recover the correct identifiers from a trusted source.
+
+**Treatment:** Preserve both records and flag the missing identifiers until verified values are available.
+
 ## 4. Unresolved Records
 
 Records that cannot be reliably corrected using the available information will remain unchanged in the cleaned dataset.
@@ -147,6 +159,19 @@ The following principles apply:
 - Flag unresolved records so they can be identified in reporting and downstream analysis.
 - Document the reason for retaining each unresolved issue.
 - Revisit unresolved records if additional source information becomes available.
+
+**Outstanding Data Issues:**
+
+- **SHP-0075:** Negative Kits Requested quantity (-12).
+- **SHP-0041:** Unusually high Kits Shipped quantity (999).
+- **SHP-0013:** Potential duplicate Shipment ID.
+- **Seven completed shipments:** Delivery Dates are missing.
+- **Three records:** Site IDs are missing.
+- **SHP-0033 and SHP-0067:** Kits Shipped quantities are missing.
+- **Shipment Status:** Definitions and approved equivalencies are unavailable.
+- **Two records:** Shipment IDs are missing.
+- **SHP-0086:** Delivery Date (2026-06-15) precedes Ship Date (2026-08-28). Verify both dates against a trusted source.
+
 
 ## 5. Validation Requirements
 
