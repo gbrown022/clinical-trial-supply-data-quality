@@ -170,7 +170,6 @@ The following principles apply:
 - **SHP-0033 and SHP-0067:** Kits Shipped quantities are missing.
 - **Shipment Status:** Definitions and approved equivalencies are unavailable.
 - **Two records:** Shipment IDs are missing.
-- **SHP-0086:** Delivery Date (2026-06-15) precedes Ship Date (2026-08-28). Verify both dates against a trusted source.
 
 
 ## 5. Validation Requirements

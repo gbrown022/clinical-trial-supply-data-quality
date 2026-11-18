@@ -55,3 +55,21 @@ Initial profiling checks completed for selected fields. Findings and recommended
 
 ### Next Step
 Define and document transformation rules before creating the cleaned dataset.
+
+## 2026-11-18: Shipment Status Validation
+
+### Work Completed
+- Re-examined Shipment Status value discrepancies identified during initial profiling.
+- Confirmed one status value contains leading or trailing whitespace using a formula-based check.
+- Enumerated distinct Shipment Status values using `UNIQUE`.
+
+### Key Results
+- 7 distinct Shipment Status values returned across the 101 records.
+- 1 whitespace anomaly confirmed.
+- The previously observed eight-value Power Query profile may have included the column header; this explanation remains unverified.
+
+### Status
+Shipment Status value enumeration independently confirmed. The previously identified whitespace anomaly was independently verified. The discrepancy between the original Power Query profile and the seven values returned from the data range is provisionally explained but not formally resolved.
+
+### Next Step
+Resume project documentation and review outstanding validation tasks without repeating completed checks.
