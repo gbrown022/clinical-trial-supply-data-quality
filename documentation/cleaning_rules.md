@@ -37,6 +37,8 @@ Corrections that can be made consistently without changing the underlying busine
 
 **Validation:** Check affected text fields for remaining leading or trailing whitespace. Confirm that no substantive text has been changed.
 
+**Implementation:** Trailing whitespace was removed from the Shipment Status value for SHP-0093 in the cleaned dataset. The original raw value remains unchanged.
+
 ## 2. Potential Data Errors
 
 These records contain values or patterns that may indicate data-quality problems but cannot be corrected confidently without further investigation.
@@ -123,7 +125,7 @@ These issues require clarification of business definitions or verification again
 
 **Affected field:** `Shipment Status`
 
-**Observation:** Seven distinct stored labels were identified in the initial PivotTable analysis. Some additional capitalization and spacing variations may require separate examination.
+**Observation:** Seven distinct Shipment Status labels were identified in the initial PivotTable analysis. A subsequent formula-based check confirmed one value containing trailing whitespace. Capitalization and wording variations remain subject to business-rule review.
 
 **Rule:** Standardize obvious formatting variations only where the underlying status meaning is unchanged. Do not combine statuses solely because their wording appears similar.
 
@@ -148,6 +150,18 @@ Pay particular attention to:
 
 **Treatment:** Preserve both records and flag the missing identifiers until verified values are available.
 
+### CR-11: Investigate Shipment and Delivery Date Chronology
+
+**Affected record:** SHP-0086
+
+**Observation:** The Delivery Date (2026-06-15) precedes the Ship Date (2026-08-28).
+
+**Rule:** Do not change either date without verification against a trusted source.
+
+**Investigation:** Determine which date, if either, is incorrect by comparing the record against trusted shipment or delivery documentation.
+
+**Treatment:** Preserve both dates and flag the chronology violation pending verification.
+
 ## 4. Unresolved Records
 
 Records that cannot be reliably corrected using the available information will remain unchanged in the cleaned dataset.
@@ -164,6 +178,7 @@ The following principles apply:
 
 - **SHP-0075:** Negative Kits Requested quantity (-12).
 - **SHP-0041:** Unusually high Kits Shipped quantity (999).
+- **SHP-0086:** Delivery Date precedes Ship Date; both dates retained pending source verification.
 - **SHP-0013:** Potential duplicate Shipment ID.
 - **Seven completed shipments:** Delivery Dates are missing.
 - **Three records:** Site IDs are missing.
@@ -177,7 +192,7 @@ The following principles apply:
 The cleaned dataset will be checked against the following requirements:
 
 1. All six identified `Kits Requested` text values are stored as numeric values, with their original quantities preserved.
-2. Leading and trailing whitespace has been removed from applicable text fields.
+2. Identified leading and trailing whitespace anomalies have been corrected in the cleaned dataset, with original source values preserved.
 3. No records have been deleted without documented justification.
 4. Missing values have not been replaced with assumed or inferred values.
 5. Shipment Status changes are consistent with documented business definitions.
@@ -185,4 +200,4 @@ The cleaned dataset will be checked against the following requirements:
 7. Shipment and Delivery Dates are chronologically consistent wherever both dates are present.
 8. Record counts and key identifiers are reconciled against the original source dataset.
 9. All transformations are documented and reproducible.
-10. The cleaned dataset is compared against the original source to confirm that all changes are accounted for and no unintented changes have occurred.
+10. The cleaned dataset is compared against the original source to confirm that all changes are accounted for and no unintended changes have occurred.
